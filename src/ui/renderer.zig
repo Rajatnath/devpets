@@ -33,7 +33,7 @@ pub const Event = union(enum) {
 
 fn tickThread(loop: *vaxis.Loop(Event)) void {
     while (!loop.should_quit) {
-        std.time.sleep(100 * std.time.ns_per_ms); // 100ms tick for animations
+        std.Thread.sleep(100 * std.time.ns_per_ms); // 100ms tick for animations
         if (!loop.tryPostEvent(.tick)) {
             // queue full, just drop the tick
         }

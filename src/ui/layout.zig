@@ -14,7 +14,7 @@ pub fn draw(win: vaxis.Window, prof: Profile) void {
 
     // Draw Title
     const title = " DEVPET ";
-    const title_col = @max(0, @as(i32, main_win.width) / 2 - @as(i32, title.len) / 2);
+    const title_col = @max(0, @divTrunc(@as(i32, main_win.width), 2) - @divTrunc(@as(i32, title.len), 2));
     _ = win.printSegment(.{
         .text = title,
         .style = .{ .bold = true, .fg = .{ .index = 3 } }, // Yellow bold
@@ -83,26 +83,51 @@ pub fn draw(win: vaxis.Window, prof: Profile) void {
     drawPlaceholderSprite(sprite_win, prof);
 }
 
+const registry = @import("../sprite/registry.zig");
+
 fn drawPlaceholderSprite(win: vaxis.Window, prof: Profile) void {
-    const sprite =
-        \\  ( O   O )
-        \\   \  v  /
-        \\    |   |
-        \\   /     \
-    ;
+    const sprite = registry.getSpriteForProfile(prof);
 
-    _ = win.print(&.{
-        .{ .text = sprite, .style = .{ .fg = .{ .index = 5 } } }, // Magenta
-    }, .{
-        .col_offset = 5,
-        .row_offset = 2,
-    });
+    var iter = std.mem.splitScalar(u8, sprite, '\n');
+    var max_width: usize = 0;
+    var line_count: usize = 0;
 
-    _ = win.print(&.{
-        .{ .text = "Terminal UI Active. Press 'q' to exit.", .style = .{ .dim = true } },
+    // First pass to determine sprite dimensions to center it
+    while (iter.next()) |line| {
+        max_width = @max(max_width, line.len);
+        line_count += 1;
+    }
+
+    // Reset iterator for drawing
+    iter = std.mem.splitScalar(u8, sprite, '\n');
+
+    // Calculate centering offsets
+    const sprite_col = @max(0, @divTrunc(@as(i32, @intCast(win.width)), 2) - @divTrunc(@as(i32, @intCast(max_width)), 2));
+    const sprite_row = @max(0, @divTrunc(@as(i32, @intCast(win.height)), 2) - @divTrunc(@as(i32, @intCast(line_count)), 2) - 1); // Slight offset above the middle
+
+    var act_row: u16 = @intCast(sprite_row);
+
+    // Draw lines
+    while (iter.next()) |line| {
+        if (line.len == 0) continue;
+        
+        _ = win.printSegment(.{
+            .text = line,
+            .style = .{ .fg = .{ .index = 5 } }, // Magenta
+        }, .{
+            .col_offset = @intCast(sprite_col),
+            .row_offset = act_row,
+        });
+        act_row += 1;
+    }
+
+    const help_msg = "Terminal UI Active. Press 'q' to exit.";
+    const help_col = @max(0, @divTrunc(@as(i32, win.width), 2) - @divTrunc(@as(i32, help_msg.len), 2));
+    _ = win.printSegment(.{
+        .text = help_msg,
+        .style = .{ .dim = true },
     }, .{
-        .col_offset = 0,
-        .row_offset = 8,
+        .col_offset = @intCast(help_col),
+        .row_offset = @intCast(win.height - 2), // Near bottom
     });
-    _ = prof;
 }
