@@ -1,0 +1,13 @@
+.{
+    .name = .Devpet,
+    .version = "0.0.1",
+    .dependencies = .{
+        .vaxis = .{
+            .url = "git+https://github.com/rockorager/libvaxis#41fff922316dcb8776332ec460e73eaf397d5033",
+            .hash = "vaxis-0.5.1-BWNV_JJOCQAtdJyLvrYCKbKIhX9q3liQkKMAzujWS4HJ",
+        },
+    },
+    .minimum_zig_version = "0.15.2",
+    .paths = .{""},
+    .fingerprint = 0x219eac33a16728d0,
+}
