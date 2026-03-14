@@ -1,5 +1,6 @@
 const std = @import("std");
 const profile = @import("../storage/profile.zig");
+const renderer = @import("../ui/renderer.zig");
 
 pub fn run(allocator: std.mem.Allocator) !void {
     var prof = (try profile.load(allocator)) orelse profile.Profile{};
@@ -9,28 +10,7 @@ pub fn run(allocator: std.mem.Allocator) !void {
         try profile.save(allocator, prof);
     }
 
-    const next_xp = profile.xpForNextStage(prof.stage);
-
-    std.debug.print(
-        \\
-        \\ +-------------------------------------------+
-        \\ |             🥚 DEVPET                     |
-        \\ |                                           |
-        \\ |              (  O  )                      |
-        \\ |                                           |
-        \\ |          Hatching Soon...                  |
-        \\ |                                           |
-        \\ |   Stage: {s:<10}                      |
-        \\ |   XP: {d} / {d}                           |
-        \\ |                                           |
-        \\ |   Tip: Make commits to gain XP            |
-        \\ +-------------------------------------------+
-        \\
-        \\
-    , .{ profile.formatStage(prof.stage), prof.xp, next_xp });
-
-    // TODO: Replace with TUI rendering loop (Task 2)
-    std.debug.print("  TUI mode coming soon. Press Ctrl+C to exit.\n\n", .{});
+    try renderer.run(allocator, &prof);
 }
 
 pub fn status(allocator: std.mem.Allocator) !void {

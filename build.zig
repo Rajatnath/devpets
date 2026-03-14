@@ -13,6 +13,12 @@ pub fn build(b: *std.Build) void {
         }),
     });
 
+    const vaxis_dep = b.dependency("vaxis", .{
+        .target = target,
+        .optimize = optimize,
+    });
+    exe.root_module.addImport("vaxis", vaxis_dep.module("vaxis"));
+
     b.installArtifact(exe);
 
     const run_cmd = b.addRunArtifact(exe);
