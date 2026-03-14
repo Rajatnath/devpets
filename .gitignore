@@ -4,3 +4,4 @@ zig-cache
 build/*/
 .devpet
 .agent
+*.md
